@@ -29,7 +29,7 @@ for i in range(factory_count):
 
 # print(link_count, file=sys.stderr)
 # print(distances.shape, file=sys.stderr)
-print(distances, file=sys.stderr)
+# print(distances, file=sys.stderr)
 
 # Game loop
 while True:
@@ -55,6 +55,7 @@ while True:
     curTargetProd = -1
     curTargetCyborgs = -1
     curTargetValue = -1
+    curTargetOwner = -2
 
     curSourceID = -1
     curSourceCyborgs = -1
@@ -83,6 +84,7 @@ while True:
                 curTargetProd = arg3[i]
                 curTargetCyborgs = arg2[i]
                 curTargetValue = curValue
+                curTargetOwner = arg1[i]
 
     # Compute number of our cyborgs already heading for target
     cyborgsAttacking = 0
@@ -103,11 +105,16 @@ while True:
                 incomingCyborgs = incomingCyborgs + arg4[i]
 
     cyborgsDefending = cyborgsMovingToDefend + curTargetCyborgs
-    attackSize = min(cyborgsDefending - cyborgsAttacking +
-                     distances[curSourceID, curTargetID] * curTargetProd + 1,
-                     curSourceCyborgs - incomingCyborgs)
 
-    print(cyborgsAttacking - cyborgsDefending + distances[curSourceID, curTargetID] * curTargetProd + 1, file=sys.stderr)
+    # Conquer size for enemy
+    minConquerSize = cyborgsDefending - cyborgsAttacking + 1
+    if curTargetOwner == -1:
+        prodDuringTravel = ((distances[curSourceID, curTargetID] + 1) *
+                            curTargetProd)
+        minConquerSize += prodDuringTravel
+
+    attackSize = min(minConquerSize, curSourceCyborgs - incomingCyborgs)
+
     print(curSourceCyborgs - incomingCyborgs, file=sys.stderr)
     # Choose actions or print("Debug messages...", file=sys.stderr)
     if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
