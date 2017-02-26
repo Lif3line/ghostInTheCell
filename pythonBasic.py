@@ -83,25 +83,32 @@ while True:
                 curTargetProd = arg3[i]
                 curTargetCyborgs = arg2[i]
                 curTargetValue = curValue
-                print(curValue, file=sys.stderr)
-                print("Selected", file=sys.stderr)
 
     # Compute number of our cyborgs already heading for target
     cyborgsAttacking = 0
     cyborgsMovingToDefend = 0
+    incomingCyborgs = 0
     for i in range(entityCount):
         if entityType[i] == "TROOP":
+            # Our cyborgs that are already attacking the target
             if arg1[i] == 1 and arg3[i] == curTargetID:
                 cyborgsAttacking = cyborgsAttacking + arg4[i]
+
+            # Their cyborgs moving to defend
             if arg1[i] == -1 and arg3[i] == curTargetID:
                 cyborgsMovingToDefend = cyborgsMovingToDefend + arg4[i]
 
-    print(cyborgsAttacking, file=sys.stderr)
-    print(cyborgsMovingToDefend, file=sys.stderr)
+            # Cyborgs looking to attack our source
+            if arg1[i] == -1 and arg3[i] == curSourceID:
+                incomingCyborgs = incomingCyborgs + arg4[i]
 
     cyborgsDefending = cyborgsMovingToDefend + curTargetCyborgs
-    attackSize = min(cyborgsDefending - cyborgsAttacking + 1, curSourceCyborgs)
+    attackSize = min(cyborgsDefending - cyborgsAttacking +
+                     distances[curSourceID, curTargetID] * curTargetProd + 1,
+                     curSourceCyborgs - incomingCyborgs)
 
+    print(cyborgsAttacking - cyborgsDefending + distances[curSourceID, curTargetID] * curTargetProd + 1, file=sys.stderr)
+    print(curSourceCyborgs - incomingCyborgs, file=sys.stderr)
     # Choose actions or print("Debug messages...", file=sys.stderr)
     if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
         print("MOVE {} {} {}".format(curSourceID, curTargetID, attackSize))
