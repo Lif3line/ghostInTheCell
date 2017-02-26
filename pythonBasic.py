@@ -33,7 +33,7 @@ while True:
         arg_1 = int(arg_1)  # Owner (1 ally, -1 enemy, 0 neutral)
         arg_2 = int(arg_2)  # F: # cyborgs, T: id of last factory visited
         arg_3 = int(arg_3)  # F: production val, T: id of target factory
-        arg_4 = int(arg_4)  # F: N/A, T: # cyborgs in troop
+        arg_4 = int(arg_4)  # F: # turns until prod., T: # cyborgs in troop
         arg_5 = int(arg_5)  # F: N/A, T: # turns until destination
 
         # Target the factory with highest production not already owned by us
@@ -49,6 +49,8 @@ while True:
                 curSourceID = entity_id
                 curSourceCyborgs = arg_2
 
-    # Choose actions - print("MOVE source destination cyborgCount")
-    # or print("WAIT") or print("Debug messages...", file=sys.stderr)
-    print("MOVE {} {} {}".format(curSourceID, curTargetID, attackSize))
+    # Choose actions or print("Debug messages...", file=sys.stderr)
+    if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
+        print("MOVE {} {} {}".format(curSourceID, curTargetID, attackSize))
+    else:
+        print("WAIT")
