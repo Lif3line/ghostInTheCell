@@ -88,12 +88,19 @@ while True:
 
     # Compute number of our cyborgs already heading for target
     cyborgsAttacking = 0
+    cyborgsMovingToDefend = 0
     for i in range(entityCount):
         if entityType[i] == "TROOP":
             if arg1[i] == 1 and arg3[i] == curTargetID:
                 cyborgsAttacking = cyborgsAttacking + arg4[i]
+            if arg1[i] == -1 and arg3[i] == curTargetID:
+                cyborgsMovingToDefend = cyborgsMovingToDefend + arg4[i]
 
-    attackSize = min(curTargetCyborgs + 1, round(curSourceCyborgs / 2))
+    print(cyborgsAttacking, file=sys.stderr)
+    print(cyborgsMovingToDefend, file=sys.stderr)
+
+    cyborgsDefending = cyborgsMovingToDefend + curTargetCyborgs
+    attackSize = min(cyborgsDefending - cyborgsAttacking + 1, curSourceCyborgs)
 
     # Choose actions or print("Debug messages...", file=sys.stderr)
     if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
