@@ -5,12 +5,12 @@
 # pylint: disable=C0103
 
 import sys
-from numpy import zeros
+from numpy import full
 
 factory_count = int(input())  # the number of factories
 link_count = int(input())  # the number of links between factories
 
-distances = zeros([factory_count, factory_count], dtype=int)
+distances = full([factory_count, factory_count], 99, dtype=int)
 
 # Get distances between pairs of factories
 for i in range(link_count):
