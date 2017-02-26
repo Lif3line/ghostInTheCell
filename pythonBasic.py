@@ -7,6 +7,11 @@
 import sys
 from numpy import full
 
+
+def getFactoryValue(distance, production):
+    return production / distance
+
+
 factory_count = int(input())  # the number of factories
 link_count = int(input())  # the number of links between factories
 
@@ -22,8 +27,8 @@ for i in range(factory_count):
     for j in range(factory_count):
         distances[j, i] = distances[i, j]
 
-print(link_count, file=sys.stderr)
-print(distances.shape, file=sys.stderr)
+# print(link_count, file=sys.stderr)
+# print(distances.shape, file=sys.stderr)
 print(distances, file=sys.stderr)
 
 # Game loop
@@ -49,12 +54,12 @@ while True:
     curTargetID = -1
     curTargetProd = -1
     curTargetCyborgs = -1
-    curTargetDistance = 9999
+    curTargetValue = -1
 
     curSourceID = -1
     curSourceCyborgs = -1
 
-    attackSize = 5  # Number of cyborgs to send to target
+    attackSize = -1  # Number of cyborgs to send to target
 
     # Compute our source
     for i in range(entityCount):
@@ -69,18 +74,33 @@ while True:
     # Subselect by distance
     for i in range(entityCount):
         if entityType[i] == "FACTORY":
+            curValue = getFactoryValue(distances[curSourceID, entityID[i]],
+                                       arg3[i])
             if (arg1[i] != 1 and
-                    curTargetProd < arg3[i]):
+                    entityID[i] != curSourceID and  # Prevents bug when backcap
+                    curValue > curTargetValue):
                 curTargetID = entityID[i]
                 curTargetProd = arg3[i]
                 curTargetCyborgs = arg2[i]
-                curTargetDistance = distances[curSourceID, entityID[i]]
-            elif (curTargetProd == arg3[i] and
-                    distances[curSourceID, entityID[i]] < curTargetDistance):
-                curTargetID = entityID[i]
-                curTargetProd = arg3[i]
-                curTargetCyborgs = arg2[i]
-                curTargetDistance = distances[curSourceID, entityID[i]]
+                curTargetValue = curValue
+                print(curValue, file=sys.stderr)
+                print("Selected", file=sys.stderr)
+
+    # Compute number of our cyborgs already heading for target
+    cyborgsAttacking = 0
+    cyborgsMovingToDefend = 0
+    for i in range(entityCount):
+        if entityType[i] == "TROOP":
+            if arg1[i] == 1 and arg3[i] == curTargetID:
+                cyborgsAttacking = cyborgsAttacking + arg4[i]
+            if arg1[i] == -1 and arg3[i] == curTargetID:
+                cyborgsMovingToDefend = cyborgsMovingToDefend + arg4[i]
+
+    print(cyborgsAttacking, file=sys.stderr)
+    print(cyborgsMovingToDefend, file=sys.stderr)
+
+    cyborgsDefending = cyborgsMovingToDefend + curTargetCyborgs
+    attackSize = min(cyborgsDefending - cyborgsAttacking + 1, curSourceCyborgs)
 
     # Choose actions or print("Debug messages...", file=sys.stderr)
     if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
