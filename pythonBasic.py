@@ -70,7 +70,12 @@ while True:
     for i in range(entityCount):
         if entityType[i] == "FACTORY":
             if (arg1[i] != 1 and
-                    curTargetProd < arg3[i] and
+                    curTargetProd < arg3[i]):
+                curTargetID = entityID[i]
+                curTargetProd = arg3[i]
+                curTargetCyborgs = arg2[i]
+                curTargetDistance = distances[curSourceID, entityID[i]]
+            elif (curTargetProd == arg3[i] and
                     distances[curSourceID, entityID[i]] < curTargetDistance):
                 curTargetID = entityID[i]
                 curTargetProd = arg3[i]
