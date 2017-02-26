@@ -14,10 +14,6 @@ def getFactoryValue(distance, production):
 
 factory_count = int(input())  # the number of factories
 link_count = int(input())  # the number of links between factories
-
-distances = full([factory_count, factory_count], 99, dtype=int)
-
-# Get distances between pairs of factories
 for i in range(link_count):
     factory_1, factory_2, curDistance = [int(j) for j in input().split()]
     distances[factory_1, factory_2] = curDistance
@@ -56,11 +52,17 @@ while True:
     curTargetCyborgs = -1
     curTargetValue = -1
     curTargetOwner = -2
+    curSecTargetID = -1
+    curSecTargetProd = -1
+    curSecTargetDistance = 9999
 
     curSourceID = -1
     curSourceCyborgs = -1
+    curSecSourceID = -1
+    curSecSourceCyborgs = -1
 
     attackSize = -1  # Number of cyborgs to send to target
+    secAttackSize = 1
 
     # Compute our source
     for i in range(entityCount):
@@ -69,6 +71,14 @@ while True:
             if arg1[i] == 1 and curSourceCyborgs < arg2[i]:
                 curSourceID = entityID[i]
                 curSourceCyborgs = arg2[i]
+    # Compute our sources
+    for i in range(entityCount):
+        # Use our factory with the largest number of cyborgs as a source
+        if entityType[i] == "FACTORY":
+            if arg1[i] == 1 and curSourceCyborgs < arg2[i]:
+                curSecSourceID = curSourceID
+                curSecSourceCyborgs = curSourceCyborgs
+                
 
     # Compute target
     # Target the factory with highest production not already owned by us
@@ -116,11 +126,34 @@ while True:
     attackSize = min(minConquerSize, curSourceCyborgs - incomingCyborgs)
 
     print(curSourceCyborgs - incomingCyborgs, file=sys.stderr)
+    #compute collateral target
+    # Target the closest neutral factory with prod > 0
+    for i in range(entityCount):
+        if entityType[i] == "FACTORY":
+            if (arg1[i] == 0 and distances[curSecSourceID, entityID[i]] < curSecTargetDistance):
+                curSecTargetID = entityID[i]
+                curSecTargetDistance = distances[curSecSourceID, entityID[i]]
+    
+    mainAttackString = ""
+    secAttackString = ""
     # Choose actions or print("Debug messages...", file=sys.stderr)
+    if curSourceID != -1 and curTargetID != -1 and mainAttackSize >= 0:
+        mainAttackString = "MOVE {} {} {}".format(curSourceID, curTargetID, mainAttackSize)
+        if curSecSourceID != -1 and curSecTargetID != -1 and secAttackSize >= 0:
+            secAttackString = ";MOVE {} {} {}".format(curSecSourceID, curSecTargetID, secAttackSize)
+        # print("MSG Rusb B!")
+        print(mainAttackString + secAttackString)
     if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
         print("MOVE {} {} {}".format(curSourceID, curTargetID, attackSize))
         # print(";")
         # print("MSG Rusb B!")
     else:
         print("WAIT")
-        print("No valid action found", file=sys.stderr)
+        print("""No valid action found
+                 curSourceID: {}
+                 curTargetID: {}
+                 mainAttackSize: {}
+                 curSecSourceID: {}
+                 curSecTargetID: {}
+                 secAttackSize: {}
+                 """.format(curSourceID, curTargetID, mainAttackSize,curSecSourceID, curSecTargetID, secAttackSize), file=sys.stderr)
