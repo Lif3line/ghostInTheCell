@@ -72,10 +72,11 @@ while True:
         # Use our factory with the largest number of cyborgs as a source
         if entityType[i] == "FACTORY":
             if arg1[i] == 1 and curSourceCyborgs < arg2[i]:
-                curSourceID = entityID[i]
-                curSourceCyborgs = arg2[i]
                 curSecSourceID = curSourceID
                 curSecSourceCyborgs = curSourceCyborgs
+
+                curSourceID = entityID[i]
+                curSourceCyborgs = arg2[i]
 
     # Compute main target
     # Target the factory with highest production not already owned by us
