@@ -56,6 +56,12 @@ def getEntities():
             factoryCount, troopCount, bombCount)
 
 
+def computeBestTarget(factoryInfo, factoryCount):
+    """Compute the current optimal target from one of our factories"""
+    # TODO
+    return
+
+
 factory_count = int(input())  # the number of factories
 link_count = int(input())  # the number of links between factories
 
@@ -103,9 +109,7 @@ while True:
             curSourceID = factories[0][i]
             curSourceCyborgs = factories[2][i]
 
-    # Compute main target
-    # Target the factory with highest production not already owned by us
-    # Subselect by distance
+    # Compute main target - heuristic based
     for i in range(numFactories):
         curValue = getFactoryValue(distances[curSourceID, factories[0][i]],
                                    factories[3][i])
@@ -157,24 +161,24 @@ while True:
             curSecTargetID = factories[0][i]
             curSecTargetDistance = distances[curSecSourceID, factories[0][i]]
 
-    mainAttackString = ""
-    secAttackString = ""
-    # Choose actions or print("Debug messages...", file=sys.stderr)
+    # Build command list
+    commandString = ""
     if curSourceID != -1 and curTargetID != -1 and attackSize >= 0:
-        mainAttackString = "MOVE {} {} {}".format(curSourceID,
-                                                  curTargetID,
-                                                  attackSize)
-        if (curSecSourceID != -1 and
-                curSecTargetID != -1 and
-                secAttackSize >= 0):
-            secAttackString = ";MOVE {} {} {}".format(curSecSourceID,
-                                                      curSecTargetID,
-                                                      secAttackSize)
-        print(mainAttackString + secAttackString)
+        commandString += "MOVE {} {} {};".format(curSourceID,
+                                                 curTargetID,
+                                                 attackSize)
+    if (curSecSourceID != -1 and
+            curSecTargetID != -1 and
+            secAttackSize >= 0):
+        commandString = "MOVE {} {} {};".format(curSecSourceID,
+                                                curSecTargetID,
+                                                secAttackSize)
+
+    # Print out command as appropriate
+    if commandString:
+        print(commandString[:-1])  # Remove trailing ;
     else:
         print("WAIT")
-        print("WAIT")
-        print("No valid action found", file=sys.stderr)
         print("""No valid action found
                  curSourceID: {}
                  curTargetID: {}
