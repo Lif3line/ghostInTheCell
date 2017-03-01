@@ -12,10 +12,10 @@ from numpy import full
 
 def getFactoryValue(distance, production, defenders):
     """Return a heuristic valuation of a target"""
-    if distance > maxDist/2:
+    if distance > maxDist / 2:
         mod = 0.5
     else:
-        mod = 1
+        mod = 1.0
 
     return (production / (distance * 1.35)) * (1 / (1 + defenders)) * mod
 
@@ -190,7 +190,7 @@ while True:
             for j in range(numFactories):  # targets j
                 if (factories[1][j] != 1 and
                     factories[3][j] > 0 and
-                        distances[i][j] < maxDist/2):
+                        distances[i][j] < maxDist / 2):
                     attSize = computeCyborgsToCap(i, j)
                     spareCyborgs = computeSpareCyborgs(i)
 
@@ -202,7 +202,7 @@ while True:
     # Bombing logic (bomb first 2 times we attack an enemy)
     if bombsRemaining > 0:
         if (factories[1][mainTargetID] == -1 and
-                factories[2][mainTargetID] > 15):
+                factories[2][mainTargetID] > 20):
             alreadyAttacking = False
             for i in range(numBombs):
                 if bombs[3][i] == mainTargetID:
@@ -211,7 +211,7 @@ while True:
             if not alreadyAttacking:
                 shortestDist = 99
                 bomberID = mainSourceID
-                for i in range(numFactories):
+                for i in range(numFactories):  # Send from closest factory
                     if (factories[1][i] == 1 and
                             distances[i][mainTargetID] < shortestDist):
                         shortestDist = distances[i][mainTargetID]
